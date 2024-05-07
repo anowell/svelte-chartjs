@@ -20,6 +20,10 @@
     CategoryScale,
     LinearScale
   );
+
+  function onclick() {
+    console.log('Chart component has been clicked');
+  }
 </script>
 
-<Bar {data} options={{ responsive: true }} />
+<Bar {data} options={{ responsive: true }} {onclick} />

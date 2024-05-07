@@ -8,7 +8,7 @@
   interface $$Props<
     TType extends ChartType = ChartType,
     TData = DefaultDataPoint<TType>,
-    TLabel = unknown
+    TLabel = unknown,
   > extends ChartBaseProps<TType, TData, TLabel> {
     chart?: ChartJS<TType, TData, TLabel> | null;
   }
@@ -28,10 +28,14 @@
   export let options: $$Props['options'] = {};
   export let plugins: $$Props['plugins'] = [];
   export let updateMode: $$Props['updateMode'] = undefined;
+
   export let chart: $$Props['chart'] = null;
   let canvasRef: HTMLCanvasElement;
   let props = clean($$props);
 
+  let { addEventListeners, removeEventListeners } = useForwardEvents(
+    () => canvasRef
+  );
   onMount(() => {
     chart = new ChartJS(canvasRef, {
       type,
@@ -39,6 +43,7 @@
       options,
       plugins,
     });
+    addEventListeners(props);
   });
 
   afterUpdate(() => {
@@ -50,11 +55,12 @@
   });
 
   onDestroy(() => {
-    if (chart) chart.destroy();
-    chart = null;
+    if (chart) {
+      chart.destroy();
+      removeEventListeners();
+      chart = null;
+    }
   });
-
-  useForwardEvents(() => canvasRef);
 </script>
 
 <canvas bind:this={canvasRef} {...props} />
